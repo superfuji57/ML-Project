@@ -52,14 +52,5 @@ The model's output sets high expectations for the out of bag (OOB) performance w
 # Predicting on the test set
 For the project's submission, I use the predict function to use the model on the testing set. I store the variables and create txt files per the project's instructions.
 ```{r predict}
-rfPredict <- predict(rfMod, newdata=testing)
-pml_write_files = function(x){
-        n = length(x)
-        for(i in 1:n){
-                filename = paste0("problem_id_",i,".txt")
-                write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
-        }
-setwd("./answers")
-pml_write_files(rfPredict)
-
+rfPredict <- predict(rfMod, newdata=testing)        
 ```
