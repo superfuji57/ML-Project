@@ -1,0 +1,56 @@
+---
+title: "Predicting with Machine Learning on the Weight Lifting Exercise Dataset"
+author: "Andrew Won"
+date: "October 25, 2014"
+output: html_document
+---
+This document describes the process of using machine learning to predict dumbell curl classifications using data gathered by accelerometers. More information on the source of the data and project can be found [here](http://groupware.les.inf.puc-rio.br/har).
+
+# Load dependencies and data
+
+```{r dependencies, message=FALSE}
+library(caret)
+library(randomForest)
+library(beepr)
+set.seed(57)
+training <- read.csv("./data/pml-training.csv")
+testing <- read.csv("./data/pml-testing.csv")
+```
+
+# Explore the data
+```{r summary}
+str(training)
+str(testing)
+```
+
+Looking at the type of data, first thing we notice is that the test set have many NAs. Judging by the varialbes, they appear unnecessary for predicting the exercise type as described in the groupware paper. I decide to remove variables containing all NAs from both datasets.
+
+```{r vars}
+allNA <- sapply(testing, function(x)all(is.na(x)))
+training <- training[, !allNA]
+testing <- testing[, !allNA]
+```
+
+The first few variables also appear to be identifiers as seen in the above figure from the str() output. These will also be unnecessary for prediction.
+```{r vars2}
+training <- training[,8:60]
+testing <- testing[, 8:60]
+```
+
+# Model building
+
+I used the randomForest package for model building. With it there is no need for slicing and cross-validation as it is estimated internally.
+```{r train}
+library(randomForest)
+library(beepr) # alerts when function is complete
+rfMod <- randomForest(classe ~ .,data=training); beep(sound = 2)
+rfMod
+```
+
+The model's output sets high expectations for the out of bag (OOB) performance with an error rate of 0.3%.
+
+# Predicting on the test set
+For the project's submission, I use the predict function to use the model on the testing set. I store the variables and create txt files per the project's instructions.
+```{r predict}
+rfPredict <- predict(rfMod, newdata=testing)        
+```
